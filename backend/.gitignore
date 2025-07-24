@@ -33,6 +33,7 @@ frontend/.env.local
 frontend/.env.*
 frontend/build/
 frontend/dist/
+node_modules/
 
 # =====================
 # Logs & System
