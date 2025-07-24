@@ -6,18 +6,26 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.post('/process-emails', async (req, res) => {
-  const { email, password, fallbackEmail, departmentList } = req.body;
-
-  if (!email || !password || !fallbackEmail || !departmentList) {
-    return res.status(400).json({ error: 'Missing required fields' });
-  }
-
+app.post("/process-emails", async (req, res) => {
   try {
-    const result = await processEmails({ email, password, fallbackEmail, departmentList });    
-    res.json(result);
+    console.log("🔥 Incoming request to /process-emails");
+
+    const { email, password, fallbackEmail, departmentList } = req.body;
+
+    console.log("📥 Payload:", { email, fallbackEmail, departmentList });
+
+    if (!email || !password || !fallbackEmail || !departmentList) {
+      console.log("❌ Missing required fields");
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    await processEmails(email, password, fallbackEmail, departmentList);
+
+    console.log("✅ Emails processed successfully");
+    res.status(200).json({ message: "Processed successfully" });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to process emails' });
+    console.error("❌ ERROR in /process-emails:", error.stack || error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
