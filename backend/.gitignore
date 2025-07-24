@@ -7,8 +7,6 @@ __pycache__/
 *.log
 *.sqlite3
 *.db
-*.env
-.env.*
 instance/
 .cache/
 *.pkl
@@ -79,12 +77,3 @@ coverage.xml
 # FastAPI / Uvicorn
 # =====================
 *.pid
-
-# =====================
-# Environment settings
-# =====================
-.env
-.env.*
-*.pem
-*.crt
-*.key

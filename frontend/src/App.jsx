@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { Mail, Plus, Trash2, ArrowRight, ArrowLeft, CheckCircle, AlertCircle, Play } from 'lucide-react';
 
-// Set your backend URL here
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 function App() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -105,7 +103,7 @@ function App() {
         departmentList: departmentListObject
       };
 
-      const response = await fetch(`${BACKEND_URL}/process-emails`, {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/process-emails`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
