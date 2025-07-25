@@ -17,8 +17,7 @@ app.post('/process-emails', async (req, res) => {
     const result = await processEmails({ email, password, fallbackEmail, departmentList });    
     res.json(result);
   } catch (error) {
-    console.error("Error processing emails:", error); // Log the error on the server
-    res.status(500).json({ error: 'Failed to process emails: ' + error.message }); // Include error message in response
+    res.status(500).json({ error: 'Failed to process emails' });
   }
 });
 
