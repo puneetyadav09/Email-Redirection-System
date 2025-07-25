@@ -36,38 +36,49 @@ async function processEmails({ email, password, fallbackEmail, departmentList })
     const parts = messages[i].parts.filter(part => part.which === '');
     const raw = parts[0].body;
 
-    const parsed = await simpleParser(raw);
+    try {
+      const parsed = await simpleParser(raw);
 
-    const subject = parsed.subject || 'No Subject';
-    const body = parsed.text || parsed.html || 'No content';
+      const subject = parsed.subject || 'No Subject';
+      const body = parsed.text || parsed.html || 'No content';
 
-    const prompt = `Categorize the following email into one of these departments: ${Object.keys(departmentList).join(', ')}.\n\nSubject: ${subject}\n\n${body}\n\nReply only with the department name.`;
+      const prompt = `Categorize the following email into one of these departments: ${Object.keys(departmentList).join(', ')}.\n\nSubject: ${subject}\n\n${body}\n\nReply only with the department name.`;
 
-    const response = await ollama.chat({
-      model: 'llama3',
-      messages: [{ role: 'user', content: prompt }],
-    });
+      const response = await ollama.chat({
+        model: 'llama3',
+        messages: [{ role: 'user', content: prompt }],
+      });
 
-    const department = response.message.content.trim().toLowerCase();
-    const toEmail = departmentList[department] || fallbackEmail;
-    const status = departmentList[department] ? department : 'Fallback';
+      const department = response.message.content.trim().toLowerCase();
+      const toEmail = departmentList[department] || fallbackEmail;
+      const status = departmentList[department] ? department : 'Fallback';
 
-    await forwardEmail({
-      fromEmail: email,
-      password,
-      toEmail,
-      subject,
-      body,
-      attachments: parsed.attachments || []
-    });
+      await forwardEmail({
+        fromEmail: email,
+        password,
+        toEmail,
+        subject,
+        body,
+        attachments: parsed.attachments || []
+      });
 
-    forwarded.push({ subject, to: toEmail, department: status });
+      forwarded.push({ subject, to: toEmail, department: status });
+    } catch (emailProcessingError) {
+      console.error("Error processing a single email:", emailProcessingError);
+    }
   }
 
-  return {
-    message: 'All emails processed and forwarded',
-    forwarded,
-  };
+  try {
+    await connection.closeBox();
+    connection.end();
+  } catch (connectionError) {
+    console.error("Error closing IMAP connection:", connectionError);
+  } finally {
+      return {
+        message: 'All emails processed and forwarded',
+        forwarded,
+      };
+  }
 }
 
 module.exports = { processEmails };
